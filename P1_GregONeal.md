@@ -2,14 +2,15 @@
 
 %%% Constants
 
-gK=36; %Potassium channel conductance
-gNA=120; %Sodium channel conductance
-gL=0.3; %Leakage channel conductance
-Ek=-12; %volt across K channel
-Ena=115; %Volt across Na channel
-El=10.6; %Volt across leakage channel
-V_rest=0; %resting membrane voltage
-Cm=1; %Membrane capacitance
+gK=36; %Potassium channel conductance (mS/cm^2)
+gNA=120; %Sodium channel conductance (mS/cm^2)
+gL=0.3; %Leakage channel conductance (mS/cm^2)
+Ek=-12; %volt across K channel (mV)
+Ena=115; %Volt across Na channel (mV)
+El=10.6; %Volt across leakage channel (mV)
+V_rest=0; %resting membrane voltage (mV) (we will later subtract by 70 to 
+%receive accurate values. Code does not run properly with V_rest= -70
+Cm=1; %Membrane capacitance (microFarads/cm^2)
 
 
 %%% Initial time/other initial conditions
@@ -17,7 +18,7 @@ Cm=1; %Membrane capacitance
 %Total simulation time: 100ms
 t=0; % initial time (ms)
 ss=1; %Step size
-Vm= V_rest; %initial voltage
+Vm= V_rest; %initial voltage (mV)
 
 % Initialize Gating variables:
 Am=0.1*((25-Vm)/(exp((25-Vm)/10)-1));
@@ -31,10 +32,10 @@ n=An/(An+Bn);
 h=Ah/(Ah+Bh);
 
 % Currents:
-I=0;
-Il=gL*(Vm-El);
-Ik=n^4*gK*(Vm-Ek);
-Ina=m^3*gNA*h*(Vm-Ena);
+I=0; %Steady state neuron will have no current
+Il=gL*(Vm-El); %Leakage current
+Ik=n^4*gK*(Vm-Ek); %Current through K channels
+Ina=m^3*gNA*h*(Vm-Ena); %Current through Na channels
 I_ion=I-Ina-Ik-Il;
 
 % Derivatives:
@@ -44,11 +45,13 @@ Vm= Vm+ss*dVm_dt; %updated voltage
 dm_dt=Am*(1-m)-Bm*m; 
 dn_dt=An*(1-n)-Bn*n;
 dh_dt=Ah*(1-h)-Bh*h;
+
+%Update m, n, h
 m= m+ss*dm_dt;
 n= n+ss*dn_dt;
 h= h+ss*dh_dt;
 
-%Vectors
+%Vectors (used later to plot graph)
 VecX= (0:100); %Time vector
 VecY= (Vm); %Voltage vector
 VecgK= (gK); %Potassium conductance vector
@@ -97,13 +100,13 @@ while t <= 100
     t= t+ss; 
     
     % Adding new values to voltage & conductance vectors
-    VecY= [VecY Vm];
-    VecgNA= [VecgNA gNA];
-    VecgK= [VecgK gK];
+    VecY= [VecY Vm]; %Voltage vector
+    VecgNA= [VecgNA gNA]; %Sodium conductance vector
+    VecgK= [VecgK gK]; %Potassium conductance vector
     
 end
 
-VecY= VecY-70;
+VecY= VecY-70; %This is to correct for starting V_rest at 0
 
 %Plotting
 plot(VecX, VecY, 'c-')
