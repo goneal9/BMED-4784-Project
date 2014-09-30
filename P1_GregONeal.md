@@ -53,13 +53,14 @@ while t <= 100
     
     % Currents:
     I=0; %steady state current=0
-    Il=maxCondL.*(Vm-El); %leakage current
+    Il=maxCondL.*(Vm-El); %leakage current (All other ions besides Na+ & K+)
     Ik=(n.^4).*maxCondK.*(Vm-Ek); %current across K channel
     Ina=(m.^3).*maxCondNA.*h.*(Vm-Ena); %Current across sodium channel
-    I_ion=I-Ina-Ik-Il;
-
+    I_ion=Ina+Ik+Il; %I_ion is the ionic current 
+    Ic=I-I_ion;%Ic is the capacitative current
+    
     % Update voltage derivative
-    dVm_dt=I_ion/Cm; 
+    dVm_dt=Ic/Cm; 
     % Use Euler's method to update voltage
     Vm= Vm+ss*dVm_dt;
     
