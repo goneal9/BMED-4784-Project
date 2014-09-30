@@ -52,7 +52,14 @@ while t <= 100
     Bh=1/(exp((30-Vm)/10)+1);
     
     % Currents:
+    %if t<=0.5
+    %    I=5; %5 uA/cm^2
+    %else
+    %    I=0;
+    %end
+    
     I=0; %steady state current=0
+    %I=5; %5uA/cm^2
     Il=maxCondL.*(Vm-El); %leakage current (All other ions besides Na+ & K+)
     Ik=(n.^4).*maxCondK.*(Vm-Ek); %current across K channel
     Ina=(m.^3).*maxCondNA.*h.*(Vm-Ena); %Current across sodium channel
@@ -84,7 +91,7 @@ while t <= 100
     VecgK= [VecgK gK]; %Potassium conductance vector
     
     % Update time
-    t= t+.01;  
+    t= t+ss;  
 end
 
 VecY= VecY-70; %This is to correct for starting V_rest at 0
@@ -106,6 +113,7 @@ hold on
 cK= plot(VecX, VecgK, 'r');
 title('Channel Conductances of Na/K for Steady State Neuron')
 legend([cNA,cK],'Conductance for Na+','Conductance for K+')
-axis([0,100,0,5])
+axis([0,100,0,35])
 ylabel('conductance (mS/cm^2)')
 xlabel('Time(ms)')
+
